@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define ADD 1
+#define DEL 2
+#define SHOW 3
+#define END 4
+#define TRUE 1
+#define FALSE 0
+#define SIZE 5
+
+typedef struct node * ptr;
+typedef struct node {
+	int data;
+	ptr link;
+}Node;
+
+typedef struct list {
+	ptr front;
+	ptr rear;
+}List;
+
+int menu() {
+	int n;
+
+	printf("<Menu>\n");
+	printf("1) Add a element\n");
+	printf("2) Delete a element\n");
+	printf("3) Show the list\n");
+	printf("4) End\n\n");
+	printf("메뉴를 선택하세요: ");
+	scanf("%d", &n);
+	printf("\n");
+
+	return n;
+}
+
+void add_element(List * L) {
+	ptr new_node = (ptr)malloc(sizeof(Node));
+	int num;
+
+	printf("넣을 원소를 입력해주세요: ");
+	scanf("%d", &num);
+	new_node->data = num;
+	new_node->link = NULL;
+	if (queue_empty(L) == TRUE)
+		L->front = new_node;
+	else if (queue_empty(L) == FALSE)
+		L->rear->link = new_node;
+	L->rear = new_node;
+	printf("원소 %d를 넣었습니다.\n\n", num);
+}
+
+void delete_element(List * L) {
+	ptr post_front = (ptr)malloc(sizeof(Node));
+	int num, i;
+
+	if (queue_empty(L) == TRUE)
+		printf("queue가 비워져있습니다!\n\n");
+	else if (queue_empty(L) == FALSE) {
+		num = (L->front)->data;
+		if (L->front == L->rear) {
+			free(L->front);
+			printf("지워진 원소는 %d입니다.\n\n", num);
+			L->front = NULL;
+			L->rear = NULL;
+		}
+		else {
+			post_front = L->front->link;
+			free(L->front);
+			printf("지워진 원소는 %d입니다.\n\n", num);
+			L->front = post_front;
+		}
+	}
+	free(post_front);
+}
+
+int queue_empty(List * L) {
+	if (L->front == NULL)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+void show_list(List * L) {
+	ptr show = (Node *)malloc(sizeof(Node));
+	int i;
+
+	if (queue_empty(L) == TRUE)
+		printf("queue가 비워져있습니다!\n");
+	else if (queue_empty(L) == FALSE) {
+		show = L->front;
+		for (i = 1; (show->link) != NULL; show = show->link)
+			printf("%d번째 원소는 %d입니다.\n", i, show->data);
+		printf("%d번째 원소는 %d입니다.\n", i, L->rear->data);
+	}
+	printf("\n");
+	free(show);
+}
+
+void end(List * L) {
+	ptr post_front = (ptr)malloc(sizeof(Node));
+
+	for (post_front = L->front->link; L->front != L->rear; post_front = L->front->link) {
+		free(L->front);
+		L->front = post_front;
+	}
+	free(L->front);
+	free(L);
+	free(post_front);
+	printf("프로그램을 종료합니다!\n");
+}
+
+int main() {
+	List * L1 = (List *)malloc(sizeof(List));
+	L1->front = NULL;
+	L1->rear = NULL;
+	int m;
+
+	do {
+		m = menu();
+
+		if (m == ADD)
+			add_element(L1);
+		else if (m == DEL)
+			delete_element(L1);
+		else if (m == SHOW)
+			show_list(L1);
+		else if (m == END)
+			end(L1);
+	} while (m != END);
+
+	return 0;
+}
